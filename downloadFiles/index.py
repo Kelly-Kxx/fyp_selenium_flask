@@ -8,21 +8,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver import ActionChains
-# import shutil
-# from zipfile import ZipFile, ZipInfo
-# import os
-# from openpyxl.reader.excel import ExcelReader
-# import openpyxl
-# import csv
-# import pandas
-##########################################################################################
+from waiting import Wait
+from download import findrow, click_to_export, download
 
 
-
-
-
-
-##########################################################################################################
 path = ".\chromedriver.exe"
 driver = webdriver.Chrome(path)
 #service = Service('./chromedriver')
@@ -32,65 +21,17 @@ driver = webdriver.Chrome(path)
 driver.get("https://utils.bim.emsd.gov.hk/aimp/index")
 driver.maximize_window()
 
-##########################################################################################################
 user = driver.find_element_by_id("userName")
 user.send_keys("Forida")
 pw = driver.find_element_by_id("password")
 pw.send_keys("123456")
 pw.send_keys(Keys.RETURN)
-##########################################################################################################
-def Wait(waiting_time, xpath):
-    return WebDriverWait(driver, waiting_time).until(
-        EC.element_to_be_clickable((By.XPATH, xpath))
-    )
-def click_to_export():
-    driver.find_element_by_xpath(
-    "//*[@id='root']/div/section/section/main/div[1]/div[1]/div/div[9]/button").click()
-def findrow():
-    row= driver.find_elements_by_xpath(
-        "//tr[@class='ant-table-row ant-table-row-level-0']//td[@class]")
-    id=row[0].text
-    status=row[2].text
-    return id,status
-def download(): 
-    old_id = findrow()[0]
-    click_to_export()
-    new_id = findrow()[0]
-    new_status = findrow()[1]
-    while (old_id == new_id):
-        new_id = findrow()[0]
-        new_status = findrow()[1]
-###############################################################################################################
-    #count the time for the pending
-    starttime= time.time()
-    counter=1
-    while (old_id != new_id and new_status == "Pending" and counter<=2):
-        elapsedtime=time.time()-starttime
-        if(elapsedtime<60): #less than 5s
-            new_id = findrow()[0]
-            new_status = findrow()[1]
-        else:
-            click_to_export()
-            counter+=1
-            starttime=time.time()
-    if(counter==3): #do it 3 times
-        return (False,None)
-    ###############################################################################################################
-    #click the download button
-    #Need unzip files
-    Check = True
-    while (Check and new_status == "Complete"):
-        try:
-            WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH,
-            "//*[@id='root']/div/section/section/main/div[1]/div[3]/div[1]/div/div/div/div/div/div/table/tbody/tr[1]/td[12]/span/a")))
-            
-            down=driver.find_element_by_xpath(
-            "//*[@id='root']/div/section/section/main/div[1]/div[3]/div[1]/div/div/div/div/div/div/table/tbody/tr[1]/td[12]/span/a").click()
-            Check = False
-        except selenium.common.exceptions.ElementNotInteractableException:
-            Check = True
-        return (True,down)
-    return(False,None)
+
+
+
+
+
+
 
 def InputField_Alltable(inputfield_index): #Find Systems, Devices
     #can click the inputfield and output the outputfiles
@@ -98,7 +39,7 @@ def InputField_Alltable(inputfield_index): #Find Systems, Devices
     while (can_click):
         try:
             InputField = driver.find_elements_by_xpath("//div[@class='ant-select-selection-selected-value']")
-            Wait(20,"//div[@class='ant-select-selection-selected-value']")
+            Wait(20,"//div[@class='ant-select-selection-selected-value']", driver)
             InputField[inputfield_index].click()
             can_click = False
             All_table = driver.find_elements_by_xpath(
@@ -136,7 +77,7 @@ def download_CCS(filetype,sys,device):  #filetype always be 1
         except selenium.common.exceptions.ElementClickInterceptedException:
             pass
 
-    checking = download()  # check whether it can download or not. If not, put in Cannot_download list
+    checking = download(driver)  # check whether it can download or not. If not, put in Cannot_download list
 ################################################################################################################
 # need click the inputfield, pop out the list
     driver.implicitly_wait(20)
@@ -156,11 +97,11 @@ content = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID,
 Forida_HKBCF=True
 while(Forida_HKBCF):
     try:
-        button1 = Wait(20, '//button[@class="ant-btn ant-dropdown-trigger"]')
+        button1 = Wait(20, '//button[@class="ant-btn ant-dropdown-trigger"]',driver)
         button1.click()
 # ##########################################################################################################
 #Change Functional Location
-        button2 = Wait(20, '//li[@class="ant-dropdown-menu-item"]')
+        button2 = Wait(20, '//li[@class="ant-dropdown-menu-item"]',driver)
         button2.click()
         Forida_HKBCF=False
     except selenium.common.exceptions.TimeoutException:
@@ -169,7 +110,7 @@ while(Forida_HKBCF):
         pass
 # ##########################################################################################################
 # #wait for user change the project
-button3 = Wait(20, '//div[@class="ant-select-selection-selected-value"]')
+button3 = Wait(20, '//div[@class="ant-select-selection-selected-value"]',driver)
 old_value = driver.find_element_by_xpath("//div[@class='ant-select-selection-selected-value']").text
 button3.click()
 Change = False
@@ -262,7 +203,7 @@ while(index<len(Cannot_download_index)):
     elif(len(val)==1): #if length val ==1
         if(filetype!=5):
             click_to_export()
-            checking=download()
+            checking=download(driver)
             if(checking[0]==False):
                 print(val[0])
                 driver.implicitly_wait(20)
