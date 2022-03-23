@@ -1,94 +1,150 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link
-        rel="stylesheet"
-        href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-        crossorigin="anonymous"
-      />
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
       <link
-        rel="stylesheet"
-        href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-        crossorigin="anonymous"
-      />
-      <title>{% block title %}Home{%endblock%} </title>
-    </head>
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script>
+      $(document).ready(function(){
+        $('#sample_form').on('submit', function(event){
+          event.preventDefault();
+          var count_error = 0;
+          if(count_error == 0)
+          {
+           $.ajax({
+          url:"/ajaxprogressbar",
+          method:"POST",
+          data:$(this).serialize(),
+          beforeSend:function()
+          {
+           $('#change_folder').attr('disabled', 'disabled');
+           $('#process').css('display', 'block');
+          },
+          success:function(data)
+          { 
+           var percentage = 0;
+         
+           var timer = setInterval(function(){
+            percentage = percentage + 20;
+            progress_bar_process(percentage, timer,data);
+           }, 1000);
+          }
+         })
+          }
+          else
+          {
+           return false;
+          }
+            
+         });
+           
+         function progress_bar_process(percentage, timer,data)
+         {
+        $('.progress-bar').css('width', percentage + '%');
+        if(percentage > 100)
+        {
+         clearInterval(timer);
+         $('#sample_form')[0].reset();
+         $('#process').css('display', 'none');
+         $('.progress-bar').css('width', '0%');
+         $('#save').attr('disabled', false);
+         $('#success_message').html(data);
+         setTimeout(function(){
+          $('#success_message').html('');
+         }, 5000);
+        }
+         }
+           
+        });
+    </script>
+    <title>{% block title %}Home{%endblock%} </title>
     
-    <body>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <button
-            class="navbar-toggler"
-            type="button"
-            data-toggle="collapse"
-            data-target="#navbar"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbar">
-            <div class="navbar-nav">
-              {%if user.is_authenticated%}
-              <a class="nav-item nav-link" id="home" href="/">Home</a>
-              <a class="nav-item nav-link" id="logout" href="/auth/logout">Logout</a>
-              {%else%}
-              <a class="nav-item nav-link" id="login" href="/auth/login">Login</a>
-              <a class="nav-item nav-link" id="signUp" href="/auth/signup">Sign Up</a>
-              {%endif%}
-        
-              
-              
-       
-            </div>
-          </div>
+    <style>
+        nav a {
+            color: #d64161;
+            font-size: 3em;
+            margin-left: 50px;
+            text-decoration: none;
+        }
+        .inner-addon { 
+          position: relative; 
+      }
+      
+      /* style icon */
+      .inner-addon .glyphicon {
+        position: absolute;
+        padding: 8px;
+        pointer-events: none;
+        color : white
+      }
+      
+      /* align icon */
+      .left-addon .glyphicon  { left:  0px;}
+      .right-addon .glyphicon { right: 0px;}
+      
+      /* add padding  */
+      .left-addon input  { padding-left:  30px; }
+      .right-addon input { padding-right: 30px; }
+    </style>
+</head>
+<body>
+ 
+  {%with messages = get_flashed_messages(with_categories = true)%}
 
-        </nav>
-
-        {%with messages = get_flashed_messages(with_categories = true)%}
-            {%if messages%}
-                {%for category, message in messages%}
-                    {%if category =='error' %}
-                        <div class = "alert alert-danger alter-dismissable fade show" role="alert">
-                          {{message}}
-                          <button type="button" class="close" data-dismiss="alert">
-                          <span aria-hidden="true">&times;</span>
-                          </button>
-                        </div>
-                    {%else%}
-                    <div class = "alert alert-success alter-dismissable fade show" role="success">
-                      {{message}}
-                      <button type="button" class="close" data-dismiss="alert">
-                      <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    {%endif%}
-                {%endfor%}
-            {%endif%}
-        {%endwith%}
-
-        <div class="container">{% block content %} {% endblock %}</div>
-        <script
-        src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"
-      ></script>
-      <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"
-      ></script>
-      <script
-        src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-        crossorigin="anonymous"
-      ></script>
+  {%if messages%}
+ 
+    {% for category, message in messages %} 
   
-      <script
-        type="text/javascript"
-        src="{{ url_for('static', filename='index.js') }}"
-      ></script>
-    </body>
-</html>
+      {% if category =='error' %}
+    
+      <div class="alert alert-danger  alter-dismissable show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {%endif%}
+    {%endfor%}
+    {%endif%}
+  {%endwith%}
 
+ 
+  <div class="container">
+    <div class="d-flex align-items-start">
+      <h1><a href="/">Homepage</a></h1>
+    </div>  
+  </div>
+  <br />
+
+ 
+
+  <div class="content">
+    {% block content_block %} {% endblock %}
+  </div>
+    <script
+    src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"
+  ></script>
+</body>
+</html>
 
