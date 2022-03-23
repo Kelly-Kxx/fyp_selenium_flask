@@ -21,15 +21,28 @@ def homepage():
     
 
 
+<<<<<<< HEAD
 # @views.route('/delete-note',method=['POST'])
+=======
+# @views.route('/delete-note',method=['POST']) #not index.js problem
+>>>>>>> 2a7d6be (create table, create model, insert data)
 # def delete_note():
    
 #     note = json.loads(request.data)
 
+<<<<<<< HEAD
 #     # noteId = note['noteId'] #index.js
 #     # note = Note.query.get(noteId)
 #     # if(note):
 #     #     if(note.user_Id==current_user.id):
 #     #         db.session.delete(note)
 #     #         db.session.commit()
+=======
+#     noteId = note['noteId'] #index.js
+#     note = Note.query.get(noteId)
+#     if(note):
+#         if(note.user_Id==current_user.id):
+#             db.session.delete(note)
+#             db.session.commit()
+>>>>>>> 2a7d6be (create table, create model, insert data)
 #     return jsonify({}) # turn into json object
