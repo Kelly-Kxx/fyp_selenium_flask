@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %} Data {% endblock %}
+{% block content %}
+        <div class='excel_data'>
+            <!-- <p>{{ d }}</p> -->
+            <div class="table-responsive-sm">
+                <table class="table table-striped">
+                  
+                    <thead>   
+                      <tr>
+                        {% for attr in attr_list%}
+                            <th scope="col">{{attr}}</th>
+                        {% endfor %}
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in data %}
+                        
+                      <tr>
+                        {%for item in row%}
+                            <td>{{item}}</td>  
+                        {% endfor %} 
+                      </tr>
+                      
+                    {% endfor %}
+                    </tbody>
+                  </table>
+            </div>
+        </div>
+    
+{% endblock %}

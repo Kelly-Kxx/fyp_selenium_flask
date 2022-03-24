@@ -3,6 +3,10 @@ import shutil
 from zipfile import ZipFile
 import sqlite3
 from sqlite3 import Error
+from pathlib import Path
+#from downloadFiles.dir import sort_dir
+import os
+from datetime import datetime
 ##########################################################################################
 #create Zipfile EMSD folder
 def create_folders(zip_files_path, unzipped_path):
@@ -26,6 +30,8 @@ def move_files(DOWNLOADS, ZIP):
                 shutil.move(filepath,ZIP)
 
 def unzip_files(ZIP,EMSD):
+    # ZIP: directory name containing .zip file
+    # EMSD: destiantion
     current_working_dir= os.getcwd()
     for root,directory,file in os.walk(ZIP):
         for filename in file:
@@ -37,10 +43,32 @@ def unzip_files(ZIP,EMSD):
                     unzip_filepath=os.path.join(current_working_dir,zip.namelist()[0])
                     shutil.move(unzip_filepath,EMSD)
 
-def create_database_file(dest_folder, loc_sys):
-    dest = os.path.join(dest_folder,loc_sys)
+
+
+
+
+def create_database_file(dest_folder, loc):
+    dest = os.path.join(dest_folder,loc)
     dest = dest+".db"
     isdir=os.path.isdir(dest)
     if not isdir:
         with open(dest,"w") as f:
             return dest
+
+
+def rename(dir , location,sys,device, filetype):
+    search_dir = dir
+    os.chdir(search_dir)
+    
+    files = filter(os.path.isfile, os.listdir(search_dir))
+    files = [os.path.join(search_dir, f) for f in files] # add path to each file
+    files.sort(key=lambda x: os.path.getmtime(x))
+    
+    new_name = 'CCS'+ '_' +location + '_' + sys + '_' + device + filetype
+    
+
+    if(os.path.isfile(os.path.join(search_dir,new_name))):
+        os.remove(new_name)
+    os.rename(files[-1], new_name)
+    
+

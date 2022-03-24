@@ -19,18 +19,15 @@ def click_to_export(driver):
     driver.find_element_by_xpath(
     "//*[@id='root']/div/section/section/main/div[1]/div[1]/div/div[9]/button").click()
 
-def checkOperationID(driver):
-    old_id = findrow(driver)[0]
-    click_to_export(driver)
-    new_id = findrow(driver)[0]
-    new_status = findrow(driver)[1]
-    while (old_id == new_id):
-        new_id = findrow(driver)[0]
-        new_status = findrow(driver)[1]
-    return 
 
 
-def download(driver): 
+
+
+
+
+
+
+def download_Condition(driver): 
 ###############################################################################################################
 #Check for the id in Operation ID
     old_id = findrow(driver)[0]
@@ -55,9 +52,8 @@ def download(driver):
             starttime=time.time()
     if(counter==3): #do it 3 times
         return (False,None)
-    ###############################################################################################################
+###############################################################################################################
     #click the download button
-    #Need unzip files
     Check = True
     while (Check and new_status == "Complete"):
         try:

@@ -14,7 +14,7 @@ from openpyxl.reader.excel import ExcelReader
 import openpyxl
 import json
 from dest_files import create_folders, move_files , unzip_files , create_database_file
-from db_model import database_model, create_connection, create_table,insert_one_row_data
+from db_model import database_model, create_connection, create_table,insert_one_row_data, get_data
 ##########################################################################################
 #create Zipfile EMSD folder
 
@@ -34,12 +34,13 @@ unzip_files(ZIP,EMSD)
 
 test = 0
 for excel_file in os.listdir(EMSD):
-    if(test)>2:
+    asset_code = ""
+    if(test)>5:
         break
     excel_path=os.path.join(EMSD,excel_file)
     workbook=openpyxl.load_workbook(excel_path)
     worksheet=workbook.active
-    #print("Worksheet title",worksheet.title)
+    print("Worksheet title",worksheet.title)
     max_i=0
     for cell in worksheet['D']:
         if cell.row >=20:
@@ -59,6 +60,7 @@ for excel_file in os.listdir(EMSD):
                 
                 if(not done): # add attr by monnitoring the first row
                     attr_list.append(worksheet[attr_index][k].value)
+                    asset_code = cell.value
             k+=1
         done = True
         table_list.append(row_list.copy())
@@ -69,9 +71,11 @@ for excel_file in os.listdir(EMSD):
 ##########################################################################################
 # Create loc_sys.db
     DB_DEST = r"C:/Users/Kei Ka Shun/Desktop/project-env/FYP-main/website/database"
-    loc_sys = excel_file.split('.')[0] #CSS_HKBCF-001_BR1102_20220315_054759_forida
-    loc_sys = loc_sys.replace('-','_') #CSS_HKBCF_001_BR1102_20220315_054759_forida
-    print(worksheet.title)
+    loc = excel_file.split('_')[1] #CSS_HKBCF-001_BR1102_20220315_054759_forida -> HKBCF-001
+    loc = loc.replace('-','_') #HKBCF_001
+    asset_code = asset_code.split("-")[:-1]
+
+    
     for i in range(len(attr_list)):
         attr_list[i] = re.sub(r'(\(.*|\n*\)|(\.))', '',attr_list[i])  
         attr_list[i] = re.sub(r'-', '_',attr_list[i])
@@ -79,37 +83,52 @@ for excel_file in os.listdir(EMSD):
         attr_list[i] = re.sub(r' ', '_',attr_list[i])  
         attr_list[i] = re.sub(r'\n', '_',attr_list[i])  
           
+    table_name = ""
+    for i in asset_code:
+        table_name += i +'_'
+    table_name = table_name[:-1]
+    db_file= DB_DEST +'/' +loc + ".db"
+    
+    if(not os.path.isfile(os.path.join(DB_DEST,loc + ".db"))):
+        db_file = create_database_file(DB_DEST,loc)
 
-    db_file = create_database_file(DB_DEST,loc_sys)
-    table_name = loc_sys.split('_')[1] + '_' + loc_sys.split('_')[2] + '_'+ loc_sys.split('_')[3]+'_'+ worksheet.title.split(' ')[0]
-
-    statement = "Equipment_No text PRIMARY KEY,"
+    statement = "Equipment_No text PRIMARY KEY ,"
     for attr in attr_list[1:]:
         statement += f"{attr} text,"
     
     
-    insert_statement = "Equipment_No,"
+    insert_statement = "Equipment_No ,"
     for attr in attr_list[1:]:
         insert_statement += f"{attr},"
 
     
     conn = create_connection(db_file)
+    cursor = conn.cursor()
     if conn is not None:
+        
         create_table(conn,table_name, statement) # create table
-        print(len(table_list))
+        conn.commit()
+        print(f"database : {loc}, table name : {table_name} ")   
         for index in range(len(table_list)):
             table_list[index] = str(table_list[index])
             table_list[index] = table_list[index].replace("[",'')
             table_list[index] = table_list[index].replace("]",'')
-            table_list[index] = re.sub(r'None', 'NULL',table_list[index])  
-            print(table_list[index], '\n')
+            table_list[index] = table_list[index].replace("None",'NULL')
+           
             insert_one_row_data(conn,table_name,insert_statement,table_list[index]) #insert data insert_query = f"""INSERT INTO {table_name} ({attr}) VALUES({data}); """
+         
+            conn.commit()
+        
+        #get_data(conn,conn.cursor(),table_name)
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        print(cursor.fetchall())
     else:
         print("Error! cannot create the database connection.")
+    
     test+=1
-    #     if conn:
-    #         conn.close()
-    #         print("The SQLite connection is closed")
+if conn:
+    conn.close()
+    print("The SQLite connection is closed")
 
 
 

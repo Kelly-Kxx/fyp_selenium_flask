@@ -8,16 +8,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver import ActionChains
+
 from waiting import Wait
-from download import findrow, click_to_export, download
+from download import findrow, click_to_export, download_Condition
+#from dir import sort_dir
 
-
-path = ".\chromedriver.exe"
+path = "./chromedriver.exe"
 driver = webdriver.Chrome(path)
-#service = Service('./chromedriver')
-#service.start()
-
-#driver = webdriver.Remote(service.service_url)
 driver.get("https://utils.bim.emsd.gov.hk/aimp/index")
 driver.maximize_window()
 
@@ -44,6 +41,7 @@ def InputField_Alltable(inputfield_index): #Find Systems, Devices
             can_click = False
             All_table = driver.find_elements_by_xpath(
                 "//ul[@class='ant-select-dropdown-menu  ant-select-dropdown-menu-root ant-select-dropdown-menu-vertical']")
+                
         except selenium.common.exceptions.TimeoutException:
             pass
         except selenium.common.exceptions.ElementClickInterceptedException:
@@ -70,6 +68,9 @@ def download_CCS(filetype,sys,device):  #filetype always be 1
     Devices = InputField_Alltable(2)[2].find_elements_by_tag_name("li")
     driver.implicitly_wait(20)
     can_click=True
+    current_sys_name = Systems[sys].get_attribute('innerHTML')
+    current_device_name = Devices[device].get_attribute('innerHTML')
+    print(f"device {device} , current_device_name: {current_device_name} ")
     while (can_click):
         try:
             Devices[device].click()
@@ -77,16 +78,22 @@ def download_CCS(filetype,sys,device):  #filetype always be 1
         except selenium.common.exceptions.ElementClickInterceptedException:
             pass
 
-    checking = download(driver)  # check whether it can download or not. If not, put in Cannot_download list
+    checking = download_Condition(driver)  # check whether it can download or not. If not, put in Cannot_download list
 ################################################################################################################
 # need click the inputfield, pop out the list
     driver.implicitly_wait(20)
-
+    current_sys_name = Systems[sys].get_attribute('innerHTML')
+    current_device_name = Devices[device].get_attribute('innerHTML')
+    
     if (checking[0] == False):
-        print("Fail to Download [filetype,sys,device] ",[filetype,sys,device])
-        return(False,[filetype,sys,device])
+  
+        print("Fail to Download [filetype,sys,device] ",["CCS", current_sys_name, current_device_name])
+        #return(False,[filetype,sys,device])
+        return (False, ["CCS", current_sys_name, current_device_name])
     else:
-        print("Downloaded", [filetype,sys,device])
+        print("Downloaded", ["CCS", current_sys_name, current_device_name])
+        DOWNLOADS=r"C:/Users/Kei Ka Shun/Downloads" 
+        #sort_dir(DOWNLOADS,location, current_sys_name, current_device_name)
         return (True,checking[1])
 
 # ################################################################################################################
@@ -111,12 +118,13 @@ while(Forida_HKBCF):
 # ##########################################################################################################
 # #wait for user change the project
 button3 = Wait(20, '//div[@class="ant-select-selection-selected-value"]',driver)
-old_value = driver.find_element_by_xpath("//div[@class='ant-select-selection-selected-value']").text
+please_select = driver.find_element_by_xpath("//div[@class='ant-select-selection-selected-value']").text
 button3.click()
 Change = False
 while (not Change):
-    new_value = driver.find_element_by_xpath("//div[@class='ant-select-selection-selected-value']").text
-    if (new_value != old_value):
+    location = driver.find_element_by_xpath("//div[@class='ant-select-selection-selected-value']").text
+    if (location != please_select):
+        print(f"location : {location} \n")
         Change = True
 
 confirm = driver.find_element_by_xpath("//button[@class='ant-btn ant-btn-primary' and span='Confirm']").click()
@@ -141,21 +149,22 @@ filetype=1
 Cannot_download_index=[]
 list_or_download=[]
 output_files = InputField_Alltable(0)[0].find_elements_by_tag_name("li")
-print("output_files",output_files)
+
 while(filetype<len(output_files)):
     output_files[filetype].click()
     if(filetype==1):
         driver.implicitly_wait(3)
         Systems = InputField_Alltable(1)[1].find_elements_by_tag_name("li")
-        for sys in range(3): # need change
+        for sys in range(3): # (len(Systems))
     
             Systems[sys].click()
+            
             driver.implicitly_wait(3)
             Devices = InputField_Alltable(2)[2].find_elements_by_tag_name("li")
+          
             for device in range(len(Devices)):  # (len(Devices))
                 list_or_download = download_CCS(filetype, sys, device)
-                if (list_or_download[0] == False):
-                    Cannot_download_index.append(list_or_download[1])
+            
             Systems = InputField_Alltable(1)[1].find_elements_by_tag_name("li")
     # else:
     #     if(filetype!=5):
@@ -185,6 +194,8 @@ def outputfiletype(filetype):
             pass
     return output_files
 
+###############################################################################################################
+#redownload
 index=0
 print("redownload")
 while(index<len(Cannot_download_index)):
