@@ -17,8 +17,6 @@
     <title>{% block title %}Home{%endblock%} </title>
     
     <style>
-      
-
         nav a {
             color: #d64161;
             font-size: 3em;
@@ -28,13 +26,14 @@
     </style>
 </head>
 <body>
-    <nav>
-     
-        <a href="/">Homepage</a>
-    </nav>
+  <hr>
+
+        
+    
+
     <hr>
     <div class="content">
-        {% block content %} {% endblock %}
+        {% block content_block %} {% endblock %}
     </div>
 
     <script

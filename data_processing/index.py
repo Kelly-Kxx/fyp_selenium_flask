@@ -35,8 +35,7 @@ unzip_files(ZIP,EMSD)
 test = 0
 for excel_file in os.listdir(EMSD):
     asset_code = ""
-    if(test)>5:
-        break
+   
     excel_path=os.path.join(EMSD,excel_file)
     workbook=openpyxl.load_workbook(excel_path)
     worksheet=workbook.active
@@ -89,6 +88,7 @@ for excel_file in os.listdir(EMSD):
     table_name = table_name[:-1]
     db_file= DB_DEST +'/' +loc + ".db"
     
+    print("location", loc)
     if(not os.path.isfile(os.path.join(DB_DEST,loc + ".db"))):
         db_file = create_database_file(DB_DEST,loc)
 
@@ -113,7 +113,7 @@ for excel_file in os.listdir(EMSD):
             table_list[index] = str(table_list[index])
             table_list[index] = table_list[index].replace("[",'')
             table_list[index] = table_list[index].replace("]",'')
-            table_list[index] = table_list[index].replace("None",'NULL')
+            table_list[index] = table_list[index].replace("None",'null')
            
             insert_one_row_data(conn,table_name,insert_statement,table_list[index]) #insert data insert_query = f"""INSERT INTO {table_name} ({attr}) VALUES({data}); """
          
@@ -124,8 +124,7 @@ for excel_file in os.listdir(EMSD):
         print(cursor.fetchall())
     else:
         print("Error! cannot create the database connection.")
-    
-    test+=1
+
 if conn:
     conn.close()
     print("The SQLite connection is closed")

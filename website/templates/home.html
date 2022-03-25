@@ -1,56 +1,44 @@
-<!-- {% extends "base.html" %}
-{%block title%}Homepage{%endblock%}
-
-{%block content%} 
-<h1 align="center">Notes</h1>
-<ul class="list-group list-group-flust" id="notes">
-    {%for note in user.notes%}
-    <li class="list-group-item">
-        {{note.data}}
-    <button type="button" class="close" onClick="deleteNote({{ note.id }})">
-        <span aira-hidden="true">&times;</span><!-- Hidden the button --> 
-    <!-- </button>
-
-    </li>
-    {%endfor%}
-</ul>
-
-
-
-
-
-
-
-<form method="POST">
-    <textarea name ="note" id ="note" class="form-control"></textarea>
-    <br />    
-        <div align="center">
-            <button type="submit" class="btn btn-primary">
-                Add Note
-            </button>
+{% extends 'base.html' %}
+{% block title %} Data {% endblock %}
+{% block content_block %}
+<div class="form-group">
+  <form class="teamSelection" method="POST" >  
+    <select class="selectpicker" aria-label="Default select example" id="teamDropdownSelector" type="text" name="location" placeholder="Select Location">
+        <option selected>Location</option>
+         {%for i in loc_list%}
+            <option id="{{i}}" value="{{i}}">{{i}}</option>
+         {%endfor%}
+    </select>
+    <input class="btn-primary" type="submit" value="Submit">
+  </form>
+  </div>
+        <div class='excel_data'>
+            <!-- <p>{{ d }}</p> -->
+            <div class="table-responsive-sm">
+                <table class="table table-striped">
+                  
+                    <thead>   
+                      <tr>
+                        {% for attr in attr_list%}
+                         
+                            <th scope="col">{{attr if attr is not none}}</th>
+                     
+                        {% endfor %}
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in data %}
+                        
+                      <tr>
+                        {%for item in row%}
+                            <td>{{item}}</td>  
+                        {% endfor %} 
+                      </tr>
+                      
+                    {% endfor %}
+                    </tbody>
+                  </table>
+            </div>
         </div>
     
-</form>
-
-
-
-<h1 align="center">EMSD</h1>
-<ul class="list-group list-group-flust" id="emsd_list">
-    {%for note in user.notes%}
-    <li class="list-group-item">{{note.data}}</li>
-    {%endfor%}
-</ul>
-
-<form method="POST">
-    <textarea name ="EMSD data" id ="emsd" class="form-control"></textarea>
-    <br />    
-        <div align="center">
-            <button type="submit" class="btn btn-primary">
-                Add EMSD data
-            </button>
-        </div>
-    
-</form>
-
-
-{%endblock%} --> -->
+{% endblock %}
