@@ -6,7 +6,7 @@ from os.path import isfile, join
 location = Blueprint('location',__name__)
 
 @location.route('/',methods=['GET','POST']) 
-def Location():
+def get_all_location():
     if request.method == "GET":
         db_dir = "./website/database/"
         files = [f for f in listdir(db_dir) if isfile(join(db_dir, f))]

@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver import ActionChains
 
-from waiting import Wait
+from waiting import Wait, InputField_Alltable
 from download import findrow, click_to_export, download_Condition
 #from dir import sort_dir
 
@@ -30,23 +30,7 @@ pw.send_keys(Keys.RETURN)
 
 
 
-def InputField_Alltable(inputfield_index): #Find Systems, Devices
-    #can click the inputfield and output the outputfiles
-    can_click = True
-    while (can_click):
-        try:
-            InputField = driver.find_elements_by_xpath("//div[@class='ant-select-selection-selected-value']")
-            Wait(20,"//div[@class='ant-select-selection-selected-value']", driver)
-            InputField[inputfield_index].click()
-            can_click = False
-            All_table = driver.find_elements_by_xpath(
-                "//ul[@class='ant-select-dropdown-menu  ant-select-dropdown-menu-root ant-select-dropdown-menu-vertical']")
-                
-        except selenium.common.exceptions.TimeoutException:
-            pass
-        except selenium.common.exceptions.ElementClickInterceptedException:
-            pass
-    return All_table
+
 
 
 
@@ -55,7 +39,7 @@ def InputField_Alltable(inputfield_index): #Find Systems, Devices
 
 def download_CCS(filetype,sys,device):  #filetype always be 1
     driver.implicitly_wait(3)
-    Systems = InputField_Alltable(1)[1].find_elements_by_tag_name("li")
+    Systems = InputField_Alltable(driver,1)[1].find_elements_by_tag_name("li")
     sys_bool = True
     while (sys_bool):
         try:
@@ -65,7 +49,7 @@ def download_CCS(filetype,sys,device):  #filetype always be 1
             pass
 
 ################################################################################################################
-    Devices = InputField_Alltable(2)[2].find_elements_by_tag_name("li")
+    Devices = InputField_Alltable(driver,2)[2].find_elements_by_tag_name("li")
     driver.implicitly_wait(20)
     can_click=True
     current_sys_name = Systems[sys].get_attribute('innerHTML')
@@ -148,24 +132,24 @@ while(waiting):
 filetype=1
 Cannot_download_index=[]
 list_or_download=[]
-output_files = InputField_Alltable(0)[0].find_elements_by_tag_name("li")
+output_files = InputField_Alltable(driver,0)[0].find_elements_by_tag_name("li")
 
 while(filetype<len(output_files)):
     output_files[filetype].click()
     if(filetype==1):
         driver.implicitly_wait(3)
-        Systems = InputField_Alltable(1)[1].find_elements_by_tag_name("li")
+        Systems = InputField_Alltable(driver,1)[1].find_elements_by_tag_name("li")
         for sys in range(3): # (len(Systems))
     
             Systems[sys].click()
             
             driver.implicitly_wait(3)
-            Devices = InputField_Alltable(2)[2].find_elements_by_tag_name("li")
+            Devices = InputField_Alltable(driver,2)[2].find_elements_by_tag_name("li")
           
             for device in range(len(Devices)):  # (len(Devices))
                 list_or_download = download_CCS(filetype, sys, device)
             
-            Systems = InputField_Alltable(1)[1].find_elements_by_tag_name("li")
+            Systems = InputField_Alltable(driver,1)[1].find_elements_by_tag_name("li")
     # else:
     #     if(filetype!=5):
     #         click_to_export()
@@ -175,7 +159,7 @@ while(filetype<len(output_files)):
     #             Cannot_download_index.append([filetype])
     #             driver.implicitly_wait(20)
 # ##############################################################################################################
-    output_files = InputField_Alltable(0)[0].find_elements_by_tag_name("li")
+    output_files = InputField_Alltable(driver,0)[0].find_elements_by_tag_name("li")
     driver.implicitly_wait(10)
     filetype+=1
 # # ###############################################################################################################
@@ -184,7 +168,7 @@ def outputfiletype(filetype):
     can_click = True
     while (can_click):
         try:
-            output_files = InputField_Alltable(0)[0].find_elements_by_tag_name("li")
+            output_files = InputField_Alltable(driver,0)[0].find_elements_by_tag_name("li")
             driver.implicitly_wait(3)
             output_files[filetype].click()
             can_click=False
@@ -214,7 +198,7 @@ while(index<len(Cannot_download_index)):
     elif(len(val)==1): #if length val ==1
         if(filetype!=5):
             click_to_export()
-            checking=download(driver)
+            checking=download_Condition(driver)
             if(checking[0]==False):
                 print(val[0])
                 driver.implicitly_wait(20)

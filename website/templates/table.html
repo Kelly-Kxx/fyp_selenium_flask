@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %} Data {% endblock %}
+{% block content_block %}
+
+<div class="container">
+    <h3 class="card-header text-center font-weight-bold text-uppercase py-4">
+        Location: {{loc}}, System:{{sys}}, Device: {{device}}
+    </h3>
+    <button class="btn btn-info btn-lg" name="insert_data"type="submit">
+        <span class="glyphicon glyphicon-plus"></span>
+     </button>
+          
+    <div class="table-responsive-sm">
+        <table class="table table-striped">
+            <thead>   
+                <tr>
+                {% for attr in attr_list%}
+                    <th scope="col">{{attr if attr is not none}}</th>
+                {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in data %}        
+                <tr>
+                {%for item in row%}
+                    <td>{{item}}</td>  
+                {% endfor %} 
+                </tr>    
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+    
+{% endblock %}

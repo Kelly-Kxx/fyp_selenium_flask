@@ -82,9 +82,12 @@ for excel_file in os.listdir(EMSD):
         attr_list[i] = re.sub(r' ', '_',attr_list[i])  
         attr_list[i] = re.sub(r'\n', '_',attr_list[i])  
           
-    table_name = ""
-    for i in asset_code:
-        table_name += i +'_'
+    table_name = loc + '_'
+    for i,name in enumerate(asset_code):
+        # print(f"i : {i}, name: {name}")
+        if(i==4 or i ==5):
+            table_name += name +'_'
+    # print(f"table_name: {table_name}, loc: {loc}")
     table_name = table_name[:-1]
     db_file= DB_DEST +'/' +loc + ".db"
     
