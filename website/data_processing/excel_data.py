@@ -1,15 +1,16 @@
 
-from msilib.schema import tables
+
 import os
 import openpyxl
 from openpyxl.reader.excel import ExcelReader
+from datetime import datetime , date, time
 
 def proces_excel_data(EMSD,excel_file):
     asset_code = ""
     excel_path=os.path.join(EMSD,excel_file)
     workbook=openpyxl.load_workbook(excel_path)
     worksheet=workbook.active
-    print("Worksheet title",worksheet.title)
+    
     max_i=0
     for cell in worksheet['D']:
         if cell.row >=20:
@@ -36,3 +37,12 @@ def proces_excel_data(EMSD,excel_file):
         i+=1
         k=0
     return [asset_code,attr_list,table_list]
+
+def getLatestTime(excel_file):
+    curr_date = excel_file.split('_')[3]
+    curr_date = date(int(curr_date[:4]),int(curr_date[4:6]),int(curr_date[6:]))
+    curr_time = excel_file.split('_')[4]
+    curr_time = time(int(curr_time[:2]),int(curr_time[2:4]),int(curr_time[4:]))
+    curr_datetime = datetime.combine(curr_date,curr_time)
+    return curr_datetime
+    

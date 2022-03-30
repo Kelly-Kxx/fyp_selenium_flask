@@ -14,7 +14,8 @@ from download import findrow, click_to_export, download_Condition, column_export
 from changeLocation import changeLocation
 #from dir import sort_dir
 
-path = r"./chromedriver.exe"
+
+path = r"C:/Users/Kei Ka Shun/Desktop/project-env/FYP-main/website/downloadFiles/chromedriver.exe"
 driver = webdriver.Chrome(executable_path=path)
 def main():
     driver.get("https://utils.bim.emsd.gov.hk/aimp/index")
@@ -42,8 +43,6 @@ def main():
         for device in range(len(Devices)):  # (len(Devices))
             download_CCS_one_file(driver, 1, sys, device)
         Systems = InputField_Alltable(driver,1)[1].find_elements_by_tag_name("li")
-   
+    driver.quit()
 
 
-main()
-driver.quit()

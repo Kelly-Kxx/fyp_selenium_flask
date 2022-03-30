@@ -31,7 +31,10 @@ def move_files(DOWNLOADS, ZIP):
         if(name[1]==".zip"):
             if("forida" in name[0]):
                 filepath=os.path.join(DOWNLOADS,files)
-                shutil.move(filepath,ZIP)
+                destpath=os.path.join(ZIP,files)
+                if(not os.path.isfile(destpath)):
+                    shutil.move(filepath,ZIP)
+                
 
 def unzip_files(ZIP,EMSD):
     # ZIP: directory name containing .zip file
@@ -118,14 +121,14 @@ def getLatestFileTime(dirpath,zip_file_path):
     for file in list_of_files:
         if file not in need_save_file_list:
             path =  dirpath+ '/' + file
-            print(f"removed path : {path}")
+            print(f"removed files : {path}")
             os.remove(path)
    
    
     for zip_file in list_of_zipfiles:
         if zip_file not in need_save_zip_list:
             path =  zip_file_path+ '/' + zip_file
-            print(f"removed path : {path}")
+            print(f"removed zip : {path}")
             os.remove(path)
             
         

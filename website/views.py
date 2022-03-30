@@ -5,6 +5,7 @@ import sqlite3
 from numpy import empty
 from .excel_data import Device_Excel_Table, get_arr, get_by_ID_from_table
 from .location import get_all_location
+# from .downloadFiles.index import main as download_file
 # from website import excel_data
 # from downloadFiles
 views = Blueprint('views',__name__)
@@ -18,6 +19,7 @@ def Homepage():
     if request.method =="POST":   
         if request.form.get("selenium"):
             print("in selenium")
+            # download_file()
             return redirect(url_for("views.Homepage"))
         elif request.form.get("location"):
             print("selection")
