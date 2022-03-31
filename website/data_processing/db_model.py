@@ -18,6 +18,8 @@ def create_table(conn, table_name, attr_list):
     try:
         statement = "Equipment_No text PRIMARY KEY ,"
         for attr in attr_list[1:]:
+            if(attr[-1]=='_'):
+                attr = attr[:-1]
             statement += f"{attr} text,"
         sql = f""" CREATE TABLE IF NOT EXISTS {table_name} ({statement[:-1]});"""
         #print(sql +"\n")
@@ -35,14 +37,16 @@ def insert_one_row_data(conn,table_name,attr_list,str_data,ori_data,change_log):
                 attr = attr[:-1]
             insert_statement += f"{attr},"
         cursor = conn.cursor()
-       
-        insert_query = f"""INSERT INTO {table_name} ({insert_statement[:-1]}) VALUES({str_data})"""
+        insert_statement= insert_statement[:-1]
+        insert_query = f"""INSERT INTO {table_name} ({insert_statement}) VALUES({str_data})"""
+        # print("print",insert_query)
         cursor.execute(insert_query)
-      
+        print("after execute")
         conn.commit()
       
         result = get_one_row_data(cursor, table_name, ori_data[0])
-        # print("result",result)
+        
+        print("result",result)
         change_log.append({"type" : "inserted",
                             "table_name" : table_name, 
                             "attr_list" : attr_list,
@@ -50,6 +54,7 @@ def insert_one_row_data(conn,table_name,attr_list,str_data,ori_data,change_log):
         return change_log
     except sqlite3.Error as error:
         cursor = conn.cursor()
+        print("in error section")
         [same_ID_bool,data_tuple,fetched_data_tuple] = compare_equipID(conn,cursor,table_name,attr_list,ori_data)
         # print("same_ID", same_ID_bool, type(data_tuple[0]), type(fetched_data_tuple[0]))        
         if same_ID_bool: 
@@ -90,18 +95,22 @@ def py2sql(el):
 def compare_equipID(conn,cursor,table_name,attr_list,ori_data):
     try:
         equip_no = ori_data[0]
+        print("equip_no: ", equip_no)
         cursor.execute(f"""SELECT * FROM {table_name} WHERE Equipment_No=:equip_no""", {"equip_no":equip_no})
+        
         fetched_data = cursor.fetchall()[0]
+        print("fetchall2: ",fetched_data)
         fetched_data_tuple = tuple(map(py2sql, fetched_data))
         data_tuple = tuple(map(py2sql, ori_data))
-        # print("fetched_data_tuple[0]", fetched_data_tuple[0], "data_tuple[0]", data_tuple[0])
+        print("fetched_data_tuple",fetched_data_tuple, "data_tuple", data_tuple)
+        print("fetched_data_tuple[0]", fetched_data_tuple[0], "data_tuple[0]", data_tuple[0])
         fetched_data_tuple = tuple(map(str, fetched_data_tuple))
         data_tuple= tuple(map(str, data_tuple))
         same_ID_bool = (data_tuple[0] == fetched_data_tuple[0])
-        if data_tuple[0] == "10901102":
-                print(same_ID_bool, data_tuple==fetched_data_tuple )
-                for d,e in zip(data_tuple, fetched_data_tuple):
-                    print("data tuple", d,e, d == e , type(d)==type(e))
+        # if data_tuple[0] == "10901102":
+        #         print(same_ID_bool, data_tuple==fetched_data_tuple )
+        #         for d,e in zip(data_tuple, fetched_data_tuple):
+        #             print("data tuple", d,e, d == e , type(d)==type(e))
               
             
         return [same_ID_bool, data_tuple, fetched_data_tuple]
