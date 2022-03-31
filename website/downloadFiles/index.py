@@ -8,16 +8,15 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver import ActionChains
-from download_CCS import download_CCS_one_file
-from waiting import Wait, InputField_Alltable
-from download import findrow, click_to_export, download_Condition, column_export
-from changeLocation import changeLocation
+from .download_CCS import download_CCS_one_file
+from .waiting import Wait, InputField_Alltable
+from .download import findrow, click_to_export, download_Condition, column_export
+from .changeLocation import changeLocation
 #from dir import sort_dir
 
 
-path = r"C:/Users/Kei Ka Shun/Desktop/project-env/FYP-main/website/downloadFiles/chromedriver.exe"
-driver = webdriver.Chrome(executable_path=path)
-def main():
+
+def main(driver):
     driver.get("https://utils.bim.emsd.gov.hk/aimp/index")
     driver.maximize_window()
 
@@ -36,7 +35,7 @@ def main():
     output_files[1].click()
     driver.implicitly_wait(3)
     Systems = InputField_Alltable(driver,1)[1].find_elements_by_tag_name("li")
-    for sys in range(3): # (len(Systems))
+    for sys in range((len(Systems))): # (len(Systems))
         Systems[sys].click()
         driver.implicitly_wait(3)
         Devices = InputField_Alltable(driver,2)[2].find_elements_by_tag_name("li")

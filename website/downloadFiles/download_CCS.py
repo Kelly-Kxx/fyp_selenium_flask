@@ -1,5 +1,5 @@
-from waiting import Wait, InputField_Alltable
-from download import findrow, click_to_export, download_Condition
+from .waiting import Wait, InputField_Alltable
+from .download import findrow, click_to_export, download_Condition
 from selenium.webdriver.common.action_chains import ActionChains
 import selenium
 

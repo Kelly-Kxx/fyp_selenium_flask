@@ -1,33 +1,41 @@
 {% extends 'base.html' %}
 {% block title %} Homepage {% endblock %}
 {% block content_block %}
-
+<form id="#sampleform" method="POST" > 
   <div class="container">
-    
         <div class="d-flex align-items-end">
-            <form  method="POST" > 
                 <div class="d-flex">
                   <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                     <div class="btn-group mr-2" role="group" aria-label="First group">
-                    <button class="btn btn-success btn-lg" name="selenium" value="Start Selenium" type="submit">
-                      Auto Download Files 
-                      <span class="glyphicon glyphicon-download-alt"></span>
-                    </button>
+                      <div class="inner-addon left-addon">
+                        <i class="glyphicon glyphicon-play"></i>
+                        <input class="btn btn-success btn-lg" type="submit" name="selenium" value="Start Selenium">
+                    
+                      </div>
                   </div>
-                      <div class="btn-group mr-2" role="group" aria-label="Second group">
-                      <button class="btn btn-primary btn-lg" name="change_folder"type="submit">
-                        Move Downloaded Data
-                        <span class="glyphicon glyphicon-folder-open"></span>
-                    </button>
+                    <div class="btn-group mr-2 " role="group" aria-label="Second group">
+                      <div class="inner-addon left-addon">
+                        <i class="glyphicon glyphicon-folder-open"></i>
+                        <input class="btn btn-primary btn-lg"type="submit" id="change_folder" name="change_folder" value="Move Download Data">
+                   
+                      </div> 
+                       
+                   
                     </div>  
+
+                    <div class="form-group" id="process" style="display:none;">
+                      <div class="progress">
+                     <div class="progress-bar progress-bar-striped active bg-success" role="progressbar" aria-valuemin="0" aria-valuemax="100" style=""></div>
+                    </div>
+                  </div>
+                </div>
                 
                 </div>
                 </div>
-            </form>
-        
     </div>
     <hr />
-  </div>
+  </div>   
+</form>
 
 
 
@@ -40,7 +48,7 @@
   <h2>Location List</h2>
   <br />
   <form class="teamSelection" method="POST" >  
-    <select class="form-control" aria-label="Default select example" id="location" type="text" name="location" placeholder="Select Location">
+    <select class="form-control" aria-label="Default select example" id="location" type="text" name="select_location" placeholder="Select Location">
         <option selected>Location</option>
          {%for i in loc_list%}
             <option id="{{i}}" value="{{i}}">{{i}}</option>

@@ -1,4 +1,6 @@
 
+from textwrap import indent
+from flask import jsonify
 import selenium
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys  # enter key
@@ -14,11 +16,11 @@ from openpyxl.reader.excel import ExcelReader
 import openpyxl
 
 import json
-from db_requirement import attr_requirement, item_requirement, table_name_initialization
-from dest_files import create_folders, move_files , unzip_files , create_database_file, rename, getLatestFileTime
-from db_model import  create_connection, create_table,insert_one_row_data, get_data
-from excel_data import proces_excel_data, getLatestTime
-from db_requirement import location_requirement , attr_requirement, table_name_initialization, item_requirement
+from .db_requirement import attr_requirement, item_requirement, table_name_initialization
+from .dest_files import create_folders, move_files , unzip_files , create_database_file, rename, getLatestFileTime
+from .db_model import  create_connection, create_table,insert_one_row_data, get_data
+from .excel_data import proces_excel_data, getLatestTime
+from .db_requirement import location_requirement , attr_requirement, table_name_initialization, item_requirement
 
 ##########################################################################################
 #create Zipfile EMSD folder
@@ -41,6 +43,7 @@ def database_initialization():
     getLatestFileTime(EMSD,ZIP)
     latest_timestamp = ""
     init_bool = True
+    change_log = []
     for excel_file in os.listdir(EMSD):
         if(init_bool):
             latest_timestamp = getLatestTime(excel_file)
@@ -75,21 +78,28 @@ def database_initialization():
                 str_table_item = table_list[index]
                 str_table_item = item_requirement(str_table_item)
                
-                insert_one_row_data(conn,table_name,attr_list,str_table_item,table_list[index]) #insert data insert_query = f"""INSERT INTO {table_name} ({attr}) VALUES({data}); """
+                insert_one_row_data(conn,table_name,attr_list,str_table_item,table_list[index],change_log) #insert data insert_query = f"""INSERT INTO {table_name} ({attr}) VALUES({data}); """
                 conn.commit()
-            
+                
             # cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
             # print(cursor.fetchall())
         else:
             print("Error! cannot create the database connection.")
 
     if conn:
+        
+        # print(change_log)
+        json_string = json.dumps(change_log)
+
+      
+        with open('change_log.json', 'w') as outfile:
+            json.dump(json.loads(json_string),outfile,indent=4)
+        
         conn.close()
         print("The SQLite connection is closed")
         return latest_timestamp
 
-
-print("lastest timestamp:", database_initialization())
+# print("lastest timestamp:", database_initialization())
 
 
 

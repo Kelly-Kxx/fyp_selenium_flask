@@ -1,11 +1,13 @@
-from random import choices
-from flask import Blueprint, jsonify, render_template,request,flash,redirect,url_for
 
+from flask import Blueprint, jsonify, render_template,request,flash,redirect,url_for, session
+import json
 import sqlite3
 from numpy import empty
 from .excel_data import Device_Excel_Table, get_arr, get_by_ID_from_table
 from .location import get_all_location
-# from .downloadFiles.index import main as download_file
+from .data_processing.index import database_initialization
+from .downloadFiles.index import main as download_file
+from selenium import webdriver
 # from website import excel_data
 # from downloadFiles
 views = Blueprint('views',__name__)
@@ -17,14 +19,26 @@ def Homepage():
         loc_list = get_all_location()
         return render_template("home.html", loc_list = loc_list) 
     if request.method =="POST":   
+        
         if request.form.get("selenium"):
             print("in selenium")
-            # download_file()
+            path = r"C:/Users/Kei Ka Shun/Desktop/project-env/FYP-main/website/downloadFiles/chromedriver.exe"
+            driver = webdriver.Chrome(executable_path=path)
+            
+            download_file(driver)
             return redirect(url_for("views.Homepage"))
-        elif request.form.get("location"):
+        elif request.form.get("change_folder"):
+            print("change_folder")
+            timestamp = database_initialization()
+            timestamp_json = json.dumps({"timestamp" : str(timestamp)})
+            session['timestamp'] = timestamp_json
+            return redirect(url_for("views.updated_data")) # timestamp_json=timestamp_json
+        elif request.form.get("select_location"):
             print("selection")
-            loc = request.form.get("location")
+            loc = request.form.get("select_location")
+           
             return redirect(url_for("views.location_list", loc=loc))
+
         elif request.form.get("input_location"):
             print("in input")
             loc = request.form.get("input_location")
@@ -56,8 +70,18 @@ def Homepage():
             return redirect(url_for("views.Homepage"))
             
                 
-            
-            
+@views.route("/change", methods= ['GET','POST'])
+def updated_data():
+    print("updated data")
+    # ts = request.args['timestamp_json']   # counterpart for url_for()
+    ts = session['timestamp'] 
+    file = "./change_log.json"  
+    
+    with open(file, 'r') as f:
+        data = json.load(f)
+    
+ 
+    return render_template("change.html",data=data, timestamp=ts)
             
 
 @views.route('/<loc>',methods=['GET','POST'])

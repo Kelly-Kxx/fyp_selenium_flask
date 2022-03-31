@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% block title %} Updated Log {% endblock %}
+{% block content_block %}
+<section >
+    <<div class="pos-f-t">
+        
+        <nav class="navbar navbar-light bg-light">
+          <button class="navbar-toggler  ml-auto" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </nav>
+        <div class="collapse" id="navbarToggleExternalContent">
+            <div class="bg-light p-4">
+                <ul>
+                    <h4><li class="nav-item">
+                    <a href="#update_section" class="nav-link">Update</a>
+                    </li></h4>
+                    
+                    <h4><li class="nav-item">
+                    <a href="#insert_section" class="nav-link">Insert</a>
+                    </li></h4>
+                    <h4><li class="nav-item">
+                        <a href="#error_section" class="nav-link">Fail To Insert / Update</a>
+                    </li></h4>
+                </ul>
+            </div>
+          </div>
+      </div>
+      <!-- <nav class="navbar navbar-light bg-lignt">
+        <button class="navbar-toggler ml-auto" 
+                type="button" 
+                data-toggle="collapse"
+                data-target="#nav1">
+            <span class="navbar-toggler-icon my-toggler">
+          </span>
+        </button>
+        <div class="navbar-collapse collapse" id="nav1">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                <a href="#update_section" class="nav-link">Update</a>
+                </li>
+                <li class="nav-item">
+                <a href="#insert_section" class="nav-link">Insert</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#error_section" class="nav-link">Fail To Insert Or Update</a>
+                </li>
+                </ul> 
+        </div>
+    </nav> -->
+</section>
+<section id = "update_section">
+    <div class="container">
+        <div class="text-center">
+            <h2>Updated : {{timestamp}}</h2>
+        {%for dict in data%}
+            {%if dict["type"] == "updated"%}
+            <h3>{{dict["table_name"]}}</h3> 
+    
+    
+            <div class="table-responsive-sm">
+                        <table class="table table-striped">
+                            <thead>   
+                                <tr>
+                                <th scope="col">data</th>
+                                {% for attr in dict['attr_list']%}
+                                    <th scope="col">{{attr if attr is not none}}</th>
+                                {% endfor %}
+                                
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Old Data</td>   
+                                {% for item in dict["ori_data"] %}        
+                                    <td>{{item}}</td>
+                                {% endfor %}
+                            </tr>
+                            <tr>
+                                <td>New Data</td> 
+                                {% for item2 in dict["new_data"] %}        
+                                    <td>{{item2}}</td>
+                                {% endfor %}
+                            </tr>
+                            </tbody>
+                        </table>
+            </div>
+            {%endif%}
+{% endfor %}
+        </div>   
+    </div>
+    
+</section>
+
+<section id="insert_section">
+    <div class="container">
+        <div class="text-center">
+<h3>Inserted</h3>
+{%for dict in data%}
+    {%if dict["type"] == "inserted"%}
+    
+            <div class="table-responsive-sm">
+                <table class="table table-striped">
+                    <thead>   
+                        <tr>
+                        <th scope="col">data</th>
+                        {% for attr in dict['attr_list']%}
+                            <th scope="col">{{attr if attr is not none}}</th>
+                        {% endfor %}
+                        
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                        <td>Inserted Data</td>   
+                        {% for item in dict["new_data"] %}        
+                            <td>{{item}}</td>
+                        {% endfor %}
+                      </tr>
+                      
+                    </tbody>
+                </table>
+            </div>
+            {%endif%}
+{% endfor %}
+        </div>   
+    </div>
+    
+</section>
+
+<section id="error_section">
+    <div class="container">
+        <div class="text-center">
+<h3>Error</h3>
+{%for dict in data%}
+    {%if dict["type"] == "error"%}
+    
+            <div class="table-responsive-sm">
+                <table class="table table-striped">
+                    <thead>   
+                        <tr>
+                        <th scope="col">data</th>
+                        {% for attr in dict['attr_list']%}
+                            <th scope="col">{{attr if attr is not none}}</th>
+                        {% endfor %}
+                        
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                        <td>Error data</td>   
+                        {% for item in dict["ori_data"] %}        
+                            <td>{{item}}</td>
+                        {% endfor %}
+                      </tr>
+                      
+                    </tbody>
+                </table>
+            </div>
+            {%endif%}
+{% endfor %}
+        </div>   
+    </div>
+    
+</section>
+{% endblock %}
