@@ -63,13 +63,12 @@ def database_initialization():
     ##########################################################################################
     # init db
         db_file= DB_DEST +'/' +loc + ".db"
-        
-        # print("location", loc)
         if(not os.path.isfile(os.path.join(DB_DEST,loc + ".db"))):
             db_file = create_database_file(DB_DEST,loc)
         conn = create_connection(db_file)
         cursor = conn.cursor()
         if conn is not None:    
+            
             create_table(conn,table_name, attr_list) # create table
             conn.commit()
             print(f"database : {loc}, table name : {table_name} ")   
@@ -80,21 +79,13 @@ def database_initialization():
                
                 insert_one_row_data(conn,table_name,attr_list,str_table_item,table_list[index],change_log) #insert data insert_query = f"""INSERT INTO {table_name} ({attr}) VALUES({data}); """
                 conn.commit()
-                
-            # cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-            # print(cursor.fetchall())
         else:
             print("Error! cannot create the database connection.")
-
     if conn:
-        
         # print(change_log)
         json_string = json.dumps(change_log)
-
-      
         with open('change_log.json', 'w') as outfile:
-            json.dump(json.loads(json_string),outfile,indent=4)
-        
+            json.dump(json.loads(json_string),outfile,indent=4) 
         conn.close()
         print("The SQLite connection is closed")
         return latest_timestamp

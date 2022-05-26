@@ -37,21 +37,37 @@ def get_by_ID_from_table(loc, sys, device, id):
 
 
 
-def get_arr(loc,sys_bool):
+def get_arr(loc,sys=None):
     db_dir = "./website/database/"
     conn = sqlite3.connect(db_dir + '/'+ loc)
     cursor = conn.cursor()
     cursor.execute(f"""SELECT name FROM sqlite_master WHERE type='table'""")
     table_arr = cursor.fetchall()
-    
-    sys_arr, device_arr = [], []
-    for i in table_arr:
-        spl = i[0].split('_')
-        if spl[-2] not in sys_arr:
-            sys_arr.append(spl[-2])
-        if spl[-1] not in device_arr:
-            device_arr.append(spl[-1])
-    if(sys_bool):
+    if sys is None:
+        
+        sys_arr = []
+        for i in table_arr:
+            spl = i[0].split('_')
+            if spl[-2] not in sys_arr:
+                sys_arr.append(spl[-2])
         return sys_arr
     else:
+        device_arr = []
+       
+        for i in table_arr:
+            spl = i[0].split('_')
+            print(sys == spl[-2])
+            if sys == spl[-2] and spl[-1] not in device_arr:
+                device_arr.append(spl[-1])
         return device_arr
+    # sys_arr, device_arr = [], []
+    # for i in table_arr:
+    #     spl = i[0].split('_')
+    #     if spl[-2] not in sys_arr:
+    #         sys_arr.append(spl[-2])
+    #     if spl[-1] not in device_arr:
+    #         device_arr.append(spl[-1])
+    # if(sys_bool):
+    #     return sys_arr
+    # else:
+    #     return device_arr

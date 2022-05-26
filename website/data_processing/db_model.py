@@ -27,7 +27,7 @@ def create_table(conn, table_name, attr_list):
         c.execute(sql)
        
     except Error as e:
-        print(e)
+        print("Create Table Error: ",  e)
 
 def insert_one_row_data(conn,table_name,attr_list,str_data,ori_data,change_log): 
     try:
@@ -41,12 +41,10 @@ def insert_one_row_data(conn,table_name,attr_list,str_data,ori_data,change_log):
         insert_query = f"""INSERT INTO {table_name} ({insert_statement}) VALUES({str_data})"""
         # print("print",insert_query)
         cursor.execute(insert_query)
-        print("after execute")
+        # print("after execute")
         conn.commit()
-      
         result = get_one_row_data(cursor, table_name, ori_data[0])
-        
-        print("result",result)
+        # print("result",result)
         change_log.append({"type" : "inserted",
                             "table_name" : table_name, 
                             "attr_list" : attr_list,
@@ -84,9 +82,7 @@ def insert_one_row_data(conn,table_name,attr_list,str_data,ori_data,change_log):
                                 
             })
             return change_log
-          
-        
-         
+              
 
 def py2sql(el):
     if el is None:
@@ -116,9 +112,6 @@ def compare_equipID(conn,cursor,table_name,attr_list,ori_data):
         return [same_ID_bool, data_tuple, fetched_data_tuple]
     except sqlite3.Error as error:
         raise sqlite3.Error("Cannot search the compare query: ", error)
- 
-
-
 def update_data(conn, cursor,data_tuple,attr_list, table_name):
     try:
         equip_no = data_tuple[0]
@@ -138,8 +131,6 @@ def update_data(conn, cursor,data_tuple,attr_list, table_name):
     except sqlite3.Error as error:
         
         print("Cannot update table", error)
-
-
 def get_one_row_data(cursor,table_name, equip_no):
     cursor.execute(f"""SELECT * FROM {table_name} WHERE Equipment_No=:equip_no""", {"equip_no":equip_no})
     q_result = cursor.fetchall()[0]

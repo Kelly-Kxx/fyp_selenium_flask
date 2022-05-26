@@ -19,12 +19,11 @@ def Homepage():
         loc_list = get_all_location()
         return render_template("home.html", loc_list = loc_list) 
     if request.method =="POST":   
-        
         if request.form.get("selenium"):
             print("in selenium")
+            # flash("Downloading the requested files", category="error")
             path = r"C:/Users/Kei Ka Shun/Desktop/project-env/FYP-main/website/downloadFiles/chromedriver.exe"
             driver = webdriver.Chrome(executable_path=path)
-            
             download_file(driver)
             return redirect(url_for("views.Homepage"))
         elif request.form.get("change_folder"):
@@ -91,7 +90,7 @@ def location_list(loc):
     if ".db" not in loc:
         loc = loc + ".db"
     loc_no_filetype = loc.split('.')[0]
-    sys_arr = get_arr(loc,True)
+    sys_arr = get_arr(loc)
     print(f"Method: {request.method} in location list")
     
     if request.method == "GET":
@@ -112,7 +111,8 @@ def system_list(loc, sys): #loc,sys,device_arr
     if ".db" not in loc:
         loc = loc + ".db"
     loc_no_filetype = loc.split('.')[0]
-    device_arr = get_arr(loc,False)
+   
+    device_arr = get_arr(loc,sys)
     if request.method == "GET":
         print(f"in sys_list GET")
         return render_template("device.html", System = sys, device_arr = device_arr)
